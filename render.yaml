@@ -1,9 +1,12 @@
 # Blueprint Render — déploiement GPE
 # Doc : https://render.com/docs/blueprint-spec
 #
-# 3 services Laravel (Docker) + 3 bases PostgreSQL (une par service).
-# L'UI web est servie par asset-service (interface Blade) — pas de gateway
-# Nginx sur Render (les upstreams Docker internes ne résolvent pas).
+# 3 services Laravel (Docker) + 1 gateway Nginx + 3 bases PostgreSQL
+# (une par service). Le gateway expose une URL unique :
+#   /            -> UI Blade (asset-service)
+#   /api/v1/auth/*        -> auth-service
+#   /api/v1/assets/*      -> asset-service
+#   /api/v1/maintenance/* -> maintenance-service
 
 databases:
   - name: gpe-auth-db
@@ -133,3 +136,12 @@ services:
         fromDatabase:
           name: gpe-maintenance-db
           property: password
+
+  # Gateway Nginx : URL unique pour l'UI + les 3 API
+  - type: web
+    name: gpe-gateway
+    runtime: docker
+    dockerfilePath: ./gateway/Dockerfile
+    dockerContext: ./gateway
+    healthCheckPath: /
+    envVars: []

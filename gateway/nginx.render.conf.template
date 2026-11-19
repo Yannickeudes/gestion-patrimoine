@@ -1,0 +1,48 @@
+# Gateway Nginx pour Render — template substitue par envsubst (${PORT})
+server {
+    listen ${PORT};
+    server_name _;
+
+    # API Auth -> auth-service
+    location = /api/v1/auth { return 301 /api/v1/auth/; }
+    location /api/v1/auth/ {
+        proxy_pass https://gpe-auth.onrender.com/api/;
+        proxy_ssl_server_name on;
+        proxy_set_header Host gpe-auth.onrender.com;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # API Assets -> asset-service
+    location = /api/v1/assets { return 301 /api/v1/assets/; }
+    location /api/v1/assets/ {
+        proxy_pass https://gpe-assets.onrender.com/api/;
+        proxy_ssl_server_name on;
+        proxy_set_header Host gpe-assets.onrender.com;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # API Maintenance -> maintenance-service
+    location = /api/v1/maintenance { return 301 /api/v1/maintenance/; }
+    location /api/v1/maintenance/ {
+        proxy_pass https://gpe-maintenance.onrender.com/api/;
+        proxy_ssl_server_name on;
+        proxy_set_header Host gpe-maintenance.onrender.com;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # UI + routes web -> asset-service (catch-all en dernier)
+    location / {
+        proxy_pass https://gpe-assets.onrender.com;
+        proxy_ssl_server_name on;
+        proxy_set_header Host gpe-assets.onrender.com;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}

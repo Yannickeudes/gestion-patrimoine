@@ -74,9 +74,13 @@ Plateforme hébergée gratuitement sur **Render** :
 
 | Service | URL |
 |---|---|
+| **Gateway (URL unique)** | https://gpe-gateway.onrender.com |
 | Auth | https://gpe-auth.onrender.com |
 | Assets + UI | https://gpe-assets.onrender.com |
 | Maintenance | https://gpe-maintenance.onrender.com |
+
+Via le gateway : `/` sert l'UI, `/api/v1/auth/*`, `/api/v1/assets/*`,
+`/api/v1/maintenance/*` routent vers les services correspondants.
 
 Comptes seedés : `admin@gpe.local / password`, `agent@gpe.local / password`.
 
