@@ -14,6 +14,9 @@ class GatewayProxyController extends Controller
 {
     public function handle(Request $request, string $service, ?string $path = null)
     {
+        // Les services upstream (Render free tier) peuvent mettre ~60 s a demarrer
+        set_time_limit(120);
+
         $base = $service === 'auth'
             ? env('AUTH_SERVICE_URL')
             : env('MAINTENANCE_SERVICE_URL');
@@ -27,18 +30,31 @@ class GatewayProxyController extends Controller
             $url .= '?' . $request->getQueryString();
         }
 
-        $headers = $request->headers->only(['authorization', 'accept', 'content-type']);
-        $pending = Http::withHeaders($headers)->timeout(30);
+        $headers = [];
+        foreach (['authorization', 'accept', 'content-type'] as $name) {
+            if ($value = $request->header($name)) {
+                $headers[$name] = $value;
+            }
+        }
+
+        $pending = Http::withHeaders($headers)->timeout(90);
 
         $content = $request->getContent();
-        if ($content !== '' && $content !== false) {
+        if (is_string($content) && $content !== '') {
             $pending = $pending->withBody(
                 $content,
                 $request->header('Content-Type', 'application/json')
             );
         }
 
-        $response = $pending->send($request->method(), $url);
+        try {
+            $response = $pending->send($request->method(), $url);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Service upstream injoignable',
+                'error' => $e->getMessage(),
+            ], 502);
+        }
 
         return response($response->body(), $response->status())
             ->header('Content-Type', $response->header('Content-Type') ?: 'application/json');
