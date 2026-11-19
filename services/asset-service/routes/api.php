@@ -4,13 +4,14 @@ use App\Http\Controllers\ActifController;
 use App\Http\Controllers\AffectationController;
 use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\EvaluationController;
+use App\Http\Controllers\GatewayProxyController;
 use App\Http\Controllers\LocalisationController;
 use App\Http\Controllers\RapportController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', fn () => response()->json(['service' => 'asset-service', 'status' => 'ok']));
 
-Route::middleware('auth.service')->group(function () {
+$assetRoutes = function () {
     // 'categories' -> parametre {category} en singulier anglais : on force {categorie}
     Route::apiResource('categories', CategorieController::class)
         ->parameters(['categories' => 'categorie']);
@@ -25,4 +26,13 @@ Route::middleware('auth.service')->group(function () {
         Route::get('patrimoine', [RapportController::class, 'patrimoine']);
         Route::get('actifs-dormants', [RapportController::class, 'actifsDormants']);
     });
-});
+};
+
+Route::middleware('auth.service')->group($assetRoutes);
+
+// Alias /api/v1/assets/* (convention du gateway) -> memes routes internes
+Route::prefix('v1/assets')->middleware('auth.service')->group($assetRoutes);
+
+// Proxy /api/v1/{auth|maintenance}/* vers les services upstream
+Route::any('v1/{service}/{path?}', [GatewayProxyController::class, 'handle'])
+    ->where(['service' => 'auth|maintenance', 'path' => '.*']);

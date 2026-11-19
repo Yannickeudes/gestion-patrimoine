@@ -76,6 +76,8 @@ services:
         generateValue: true
       - key: AUTH_SERVICE_URL
         value: https://gpe-auth.onrender.com
+      - key: MAINTENANCE_SERVICE_URL
+        value: https://gpe-maintenance.onrender.com
       - key: DB_HOST
         fromDatabase:
           name: gpe-assets-db

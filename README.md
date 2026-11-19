@@ -74,13 +74,20 @@ Plateforme hébergée gratuitement sur **Render** :
 
 | Service | URL |
 |---|---|
-| **Gateway (URL unique)** | https://gpe-gateway.onrender.com |
-| Auth | https://gpe-auth.onrender.com |
-| Assets + UI | https://gpe-assets.onrender.com |
-| Maintenance | https://gpe-maintenance.onrender.com |
+| **URL unique (UI + API)** | https://gpe-assets.onrender.com |
+| Auth (direct) | https://gpe-auth.onrender.com |
+| Assets (direct) | https://gpe-assets.onrender.com |
+| Maintenance (direct) | https://gpe-maintenance.onrender.com |
 
-Via le gateway : `/` sert l'UI, `/api/v1/auth/*`, `/api/v1/assets/*`,
-`/api/v1/maintenance/*` routent vers les services correspondants.
+**URL unique** : `https://gpe-assets.onrender.com` sert l'UI (`/`, `/login`)
+et expose toute l'API sous le préfixe `/api/v1/` :
+
+- `/api/v1/auth/*` → auth-service (proxy interne)
+- `/api/v1/assets/*` → asset-service (alias de routes)
+- `/api/v1/maintenance/*` → maintenance-service (proxy interne)
+
+Un gateway Nginx dédié (`gateway/`) existe aussi pour un déploiement
+Docker Compose local ou un hébergeur sans limite de services.
 
 Comptes seedés : `admin@gpe.local / password`, `agent@gpe.local / password`.
 
