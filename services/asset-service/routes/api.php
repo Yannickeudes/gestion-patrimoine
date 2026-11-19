@@ -30,8 +30,9 @@ $assetRoutes = function () {
 
 Route::middleware('auth.service')->group($assetRoutes);
 
-// Alias /api/v1/assets/* (convention du gateway) -> memes routes internes
-Route::prefix('v1/assets')->middleware('auth.service')->group($assetRoutes);
+// Alias /api/v1/assets/* (convention du gateway) -> memes routes internes.
+// Le prefixe de nom evite les collisions de noms pour route:cache.
+Route::prefix('v1/assets')->name('v1.assets.')->middleware('auth.service')->group($assetRoutes);
 
 // Proxy /api/v1/{auth|maintenance}/* vers les services upstream
 Route::any('v1/{service}/{path?}', [GatewayProxyController::class, 'handle'])
