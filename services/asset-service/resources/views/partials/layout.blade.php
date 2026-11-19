@@ -98,6 +98,7 @@
     <nav>
         <div class="nav-label">Principal</div>
         <a href="/" class="{{ ($active ?? '') === 'dashboard' ? 'active' : '' }}"><span class="ico">▦</span><span>Tableau de bord</span></a>
+        <a href="/actifs" class="{{ ($active ?? '') === 'actifs' ? 'active' : '' }}"><span class="ico">◈</span><span>Actifs</span></a>
         <a href="/maintenances" class="{{ ($active ?? '') === 'maintenances' ? 'active' : '' }}"><span class="ico">⚒</span><span>Maintenances</span></a>
         <a href="/rapports" class="{{ ($active ?? '') === 'rapports' ? 'active' : '' }}"><span class="ico">▤</span><span>Rapports</span></a>
         <div class="nav-label">Administration</div>

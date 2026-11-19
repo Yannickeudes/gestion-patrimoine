@@ -8,7 +8,7 @@
 
     <div class="panel">
         <div class="panel-head">
-            <h2>Actifs du patrimoine</h2>
+            <h2>Actifs du patrimoine <a href="/actifs" style="font-size:12px;font-weight:500;color:#14b8a6;text-decoration:none;margin-left:8px">Voir tout →</a></h2>
             <div class="filters">
                 <input id="search" placeholder="Rechercher (désignation, n° série)…">
                 <select id="statutFilter">
@@ -58,7 +58,7 @@ async function loadActifs() {
     if (document.getElementById('statutFilter').value) params.set('statut', document.getElementById('statutFilter').value);
     const data = await api('/api/v1/assets/actifs?' + params);
     const rows = (data.data || []).map(a => `
-        <tr>
+        <tr style="cursor:pointer" onclick="location.href='/actifs/${a.id}'">
             <td><b>${a.numero_serie}</b></td>
             <td>${a.designation}</td>
             <td>${a.categorie?.nom || '-'}</td>
