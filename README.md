@@ -48,6 +48,7 @@ gestion-patrimoine/
 │   ├── proposition-financiere.md
 │   ├── fiche-technique.md
 │   └── guide-utilisation.md
+├── maquette/maquettes.html   # Maquettes HTML de référence (5 écrans)
 └── services/
     ├── auth-service/         # Laravel : auth, users, rôles
     ├── asset-service/        # Laravel : actifs + UI Blade
@@ -66,6 +67,12 @@ Toutes les routes `/api/v1/*` requièrent `Authorization: Bearer <token>`
 - `maintenance` : `maintenances` (CRUD), `stats`
 
 Documentation complète : **[docs/guide-utilisation.md](docs/guide-utilisation.md)**
+
+## Maquettes
+
+Maquettes UI dans **Figma** : [GPE — Maquettes Gestion du Patrimoine de l'État](https://www.figma.com/design/3VWvxTbVhZfRh733g9QeJe)
+(5 écrans : connexion, tableau de bord, liste des actifs, fiche actif, maintenances).
+Une version HTML de référence est disponible dans `maquette/maquettes.html`.
 
 ## Règles métier implémentées
 
