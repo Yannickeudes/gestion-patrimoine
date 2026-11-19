@@ -1,0 +1,84 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: gpe-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-gpe}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secret}
+      POSTGRES_DB: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-gpe}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  auth-service:
+    build:
+      context: ./services/auth-service
+    container_name: gpe-auth
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DB_HOST: db
+      DB_DATABASE: gpe_auth
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "8000"
+
+  asset-service:
+    build:
+      context: ./services/asset-service
+    container_name: gpe-assets
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DB_HOST: db
+      DB_DATABASE: gpe_assets
+      AUTH_SERVICE_URL: http://auth-service:8000
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "8000"
+
+  maintenance-service:
+    build:
+      context: ./services/maintenance-service
+    container_name: gpe-maintenance
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DB_HOST: db
+      DB_DATABASE: gpe_maintenance
+      ASSET_SERVICE_URL: http://asset-service:8000
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "8000"
+
+  gateway:
+    image: nginx:alpine
+    container_name: gpe-gateway
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./gateway/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - auth-service
+      - asset-service
+      - maintenance-service
+
+volumes:
+  pgdata:
