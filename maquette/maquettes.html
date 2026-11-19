@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Maquettes GPE — Gestion du Patrimoine de l'État</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',Arial,sans-serif; }
+  body { background:#e9ecef; padding:40px; }
+  .screen-label { font-size:13px; font-weight:600; color:#495057; margin:40px 0 8px; text-transform:uppercase; letter-spacing:.5px; }
+  .screen { width:1440px; background:#fff; border:1px solid #dee2e6; border-radius:8px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.08); }
+  .navbar { background:#1b2a4a; color:#fff; padding:0 24px; height:56px; display:flex; align-items:center; justify-content:space-between; }
+  .navbar .brand { font-weight:700; font-size:16px; }
+  .navbar .user { font-size:13px; color:#c8d3ea; }
+  .layout { display:flex; min-height:640px; }
+  .sidebar { width:230px; background:#f8f9fa; border-right:1px solid #dee2e6; padding:16px 0; }
+  .sidebar a { display:block; padding:10px 20px; color:#495057; text-decoration:none; font-size:14px; border-left:3px solid transparent; }
+  .sidebar a.active { background:#e7eefc; color:#1b2a4a; border-left-color:#1b2a4a; font-weight:600; }
+  .sidebar a:hover { background:#eef1f6; }
+  .content { flex:1; padding:24px; background:#f4f6fa; }
+  h1 { font-size:20px; color:#1b2a4a; margin-bottom:4px; }
+  .subtitle { font-size:13px; color:#6c757d; margin-bottom:20px; }
+  .cards { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+  .card-stat { background:#fff; border:1px solid #e3e8f0; border-radius:8px; padding:18px; }
+  .card-stat .value { font-size:26px; font-weight:700; color:#1b2a4a; }
+  .card-stat .label { font-size:12px; color:#6c757d; margin-top:4px; }
+  .panel { background:#fff; border:1px solid #e3e8f0; border-radius:8px; }
+  .panel-head { padding:14px 18px; border-bottom:1px solid #e9edf3; display:flex; justify-content:space-between; align-items:center; }
+  .panel-head strong { font-size:14px; color:#1b2a4a; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th { text-align:left; padding:10px 14px; background:#f8f9fa; color:#6c757d; font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:.4px; border-bottom:1px solid #e9edf3; }
+  td { padding:11px 14px; border-bottom:1px solid #f1f3f7; color:#343a40; }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:#f8faff; }
+  .badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+  .b-green { background:#d1e7dd; color:#0f5132; }
+  .b-blue { background:#cfe2ff; color:#084298; }
+  .b-orange { background:#ffe5c7; color:#8a4b00; }
+  .b-gray { background:#e2e3e5; color:#41464b; }
+  .b-red { background:#f8d7da; color:#842029; }
+  .btn { display:inline-block; padding:8px 16px; border-radius:6px; font-size:13px; font-weight:600; border:none; cursor:pointer; }
+  .btn-primary { background:#1b2a4a; color:#fff; }
+  .btn-outline { background:#fff; color:#1b2a4a; border:1px solid #c9d4ea; }
+  .btn-success { background:#198754; color:#fff; }
+  .filters { display:flex; gap:10px; margin-bottom:16px; }
+  .input, .select { padding:8px 12px; border:1px solid #ced4da; border-radius:6px; font-size:13px; background:#fff; }
+  .input.w200 { width:200px; }
+  .select.w160 { width:160px; }
+  /* Login */
+  .login-wrap { min-height:640px; background:linear-gradient(135deg,#1b2a4a,#2d4a7a); display:flex; align-items:center; justify-content:center; }
+  .login-card { background:#fff; border-radius:12px; padding:40px; width:400px; box-shadow:0 10px 40px rgba(0,0,0,.25); }
+  .login-card h2 { color:#1b2a4a; margin-bottom:4px; font-size:22px; }
+  .login-card .sub { color:#6c757d; font-size:13px; margin-bottom:24px; }
+  .field { margin-bottom:16px; }
+  .field label { display:block; font-size:12px; font-weight:600; color:#495057; margin-bottom:6px; }
+  .field input { width:100%; padding:10px 12px; border:1px solid #ced4da; border-radius:6px; font-size:14px; }
+  .field input:focus { outline:2px solid #1b2a4a33; border-color:#1b2a4a; }
+  /* Detail */
+  .detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+  .info-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #f1f3f7; font-size:13px; }
+  .info-row .k { color:#6c757d; }
+  .info-row .v { font-weight:600; color:#343a40; }
+  .tabs { display:flex; gap:4px; border-bottom:1px solid #dee2e6; margin-bottom:0; }
+  .tab { padding:10px 18px; font-size:13px; font-weight:600; color:#6c757d; border-bottom:2px solid transparent; }
+  .tab.active { color:#1b2a4a; border-bottom-color:#1b2a4a; }
+  .kv { display:flex; gap:24px; margin-bottom:16px; }
+  .kv .item { background:#f8f9fa; border-radius:8px; padding:12px 18px; min-width:180px; }
+  .kv .item .k { font-size:11px; color:#6c757d; text-transform:uppercase; }
+  .kv .item .v { font-size:17px; font-weight:700; color:#1b2a4a; }
+  .alert-info { background:#e7eefc; border-left:3px solid #1b2a4a; padding:12px 16px; border-radius:6px; font-size:13px; color:#1b2a4a; margin-bottom:16px; }
+  .timeline { border-left:2px solid #dee2e6; padding-left:20px; }
+  .timeline .ev { position:relative; padding-bottom:16px; font-size:13px; }
+  .timeline .ev::before { content:''; position:absolute; left:-26px; top:4px; width:10px; height:10px; border-radius:50%; background:#1b2a4a; }
+  .timeline .ev .t { color:#6c757d; font-size:11px; }
+  .footer-note { text-align:center; color:#adb5bd; font-size:12px; margin-top:24px; }
+</style>
+</head>
+<body>
+
+<!-- ============ ECRAN 1 : LOGIN ============ -->
+<div class="screen-label">Écran 1 — Connexion</div>
+<div class="screen">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div style="width:44px;height:44px;background:#1b2a4a;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;margin-bottom:16px">G</div>
+      <h2>Gestion du Patrimoine</h2>
+      <div class="sub">de l'État — Connectez-vous pour accéder à la plateforme</div>
+      <div class="field"><label>Adresse email</label><input type="email" value="agent@gpe.local"></div>
+      <div class="field"><label>Mot de passe</label><input type="password" value="••••••••"></div>
+      <button class="btn btn-primary" style="width:100%;padding:11px">Se connecter</button>
+      <div style="text-align:center;margin-top:14px;font-size:12px;color:#6c757d">Mot de passe oublié ? Contactez l'administrateur</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ECRAN 2 : DASHBOARD ============ -->
+<div class="screen-label">Écran 2 — Tableau de bord</div>
+<div class="screen">
+  <div class="navbar"><span class="brand">GPE — Gestion du Patrimoine</span><span class="user">Agent Patrimoine · <a href="#" style="color:#8fb0e8">Déconnexion</a></span></div>
+  <div class="layout">
+    <div class="sidebar">
+      <a href="#" class="active">▦ Tableau de bord</a>
+      <a href="#">🗂 Actifs</a>
+      <a href="#">📍 Localisations</a>
+      <a href="#">🏷 Catégories</a>
+      <a href="#">🔁 Affectations</a>
+      <a href="#">📊 Évaluations</a>
+      <a href="#">🔧 Maintenances</a>
+      <a href="#">📈 Rapports</a>
+      <a href="#">👥 Utilisateurs</a>
+    </div>
+    <div class="content">
+      <h1>Tableau de bord</h1>
+      <div class="subtitle">Vue d'ensemble du patrimoine de l'État — Novembre 2026</div>
+      <div class="cards">
+        <div class="card-stat"><div class="value">1 248</div><div class="label">Total actifs</div></div>
+        <div class="card-stat"><div class="value">84,2 Mds</div><div class="label">Valeur totale (FCFA)</div></div>
+        <div class="card-stat"><div class="value">79,6 Mds</div><div class="label">Valeur d'acquisition</div></div>
+        <div class="card-stat"><div class="value">312</div><div class="label">Affectations en cours</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><strong>Actifs récents</strong><button class="btn btn-primary">+ Nouvel actif</button></div>
+        <table>
+          <tr><th>N° série</th><th>Désignation</th><th>Catégorie</th><th>Valeur</th><th>Statut</th></tr>
+          <tr><td>VEH-2026-101</td><td>Toyota Land Cruiser</td><td>Véhicule</td><td>45 000 000</td><td><span class="badge b-green">En service</span></td></tr>
+          <tr><td>INFO-2026-044</td><td>PC Portable Dell Latitude</td><td>Informatique</td><td>850 000</td><td><span class="badge b-green">En service</span></td></tr>
+          <tr><td>IMM-2019-002</td><td>Bâtiment administratif bloc B</td><td>Immobilier</td><td>2 500 000 000</td><td><span class="badge b-blue">En service</span></td></tr>
+          <tr><td>VEH-2020-007</td><td>Toyota Hilux pick-up</td><td>Véhicule</td><td>28 000 000</td><td><span class="badge b-orange">Maintenance</span></td></tr>
+          <tr><td>MOB-2022-045</td><td>Bureau direction + chaise</td><td>Mobilier</td><td>350 000</td><td><span class="badge b-gray">En service</span></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ECRAN 3 : LISTE DES ACTIFS ============ -->
+<div class="screen-label">Écran 3 — Liste des actifs</div>
+<div class="screen">
+  <div class="navbar"><span class="brand">GPE — Gestion du Patrimoine</span><span class="user">Agent Patrimoine · Déconnexion</span></div>
+  <div class="layout">
+    <div class="sidebar">
+      <a href="#">▦ Tableau de bord</a><a href="#" class="active">🗂 Actifs</a><a href="#">📍 Localisations</a><a href="#">🏷 Catégories</a><a href="#">🔁 Affectations</a><a href="#">📊 Évaluations</a><a href="#">🔧 Maintenances</a><a href="#">📈 Rapports</a><a href="#">👥 Utilisateurs</a>
+    </div>
+    <div class="content">
+      <h1>Actifs du patrimoine</h1>
+      <div class="subtitle">1 248 actifs enregistrés</div>
+      <div class="filters">
+        <input class="input w200" placeholder="🔍 Rechercher (désignation, n° série, marque)…">
+        <select class="select w160"><option>Tous les statuts</option><option>En service</option><option>Maintenance</option><option>Réforme</option><option>Cession</option><option>Sorti</option></select>
+        <select class="select w160"><option>Toutes catégories</option><option>Immobilier</option><option>Véhicule</option><option>Informatique</option><option>Mobilier</option></select>
+        <select class="select w160"><option>Toutes régions</option><option>Littoral</option><option>Atlantique</option><option>Mono</option></select>
+        <button class="btn btn-primary">+ Nouvel actif</button>
+      </div>
+      <div class="panel">
+        <table>
+          <tr><th>N° série</th><th>Désignation</th><th>Catégorie</th><th>Acquisition</th><th>Valeur actuelle</th><th>État</th><th>Statut</th><th>Localisation</th><th></th></tr>
+          <tr><td>VEH-2026-101</td><td>Toyota Land Cruiser</td><td>Véhicule</td><td>15/03/2023</td><td>42 000 000</td><td>Bon</td><td><span class="badge b-green">En service</span></td><td>Littoral / Cotonou</td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:12px">Détail</button></td></tr>
+          <tr><td>INFO-2026-044</td><td>PC Portable Dell Latitude</td><td>Informatique</td><td>10/01/2024</td><td>780 000</td><td>Neuf</td><td><span class="badge b-green">En service</span></td><td>Littoral / Cotonou</td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:12px">Détail</button></td></tr>
+          <tr><td>IMM-2019-002</td><td>Bâtiment administratif bloc B</td><td>Immobilier</td><td>20/11/2019</td><td>2 400 000 000</td><td>Bon</td><td><span class="badge b-blue">En service</span></td><td>Littoral / Cotonou</td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:12px">Détail</button></td></tr>
+          <tr><td>VEH-2020-007</td><td>Toyota Hilux pick-up</td><td>Véhicule</td><td>05/08/2020</td><td>24 000 000</td><td>Usé</td><td><span class="badge b-orange">Maintenance</span></td><td>Atlantique / Porto-Novo</td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:12px">Détail</button></td></tr>
+          <tr><td>MOB-2022-045</td><td>Bureau direction + chaise</td><td>Mobilier</td><td>01/06/2022</td><td>350 000</td><td>Usé</td><td><span class="badge b-gray">En service</span></td><td>Littoral / Cotonou</td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:12px">Détail</button></td></tr>
+          <tr><td>VEH-2018-019</td><td>Peugeot 301</td><td>Véhicule</td><td>12/02/2018</td><td>5 000 000</td><td>Hors service</td><td><span class="badge b-red">Réforme</span></td><td>Mono / Lokossa</td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:12px">Détail</button></td></tr>
+        </table>
+        <div style="padding:12px 18px;display:flex;justify-content:space-between;font-size:12px;color:#6c757d">
+          <span>Affichage 1–6 sur 1 248</span>
+          <span>‹ 1 2 3 … 208 ›</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ECRAN 4 : FICHE ACTIF ============ -->
+<div class="screen-label">Écran 4 — Fiche détail d'un actif</div>
+<div class="screen">
+  <div class="navbar"><span class="brand">GPE — Gestion du Patrimoine</span><span class="user">Agent Patrimoine · Déconnexion</span></div>
+  <div class="layout">
+    <div class="sidebar">
+      <a href="#">▦ Tableau de bord</a><a href="#" class="active">🗂 Actifs</a><a href="#">📍 Localisations</a><a href="#">🏷 Catégories</a><a href="#">🔁 Affectations</a><a href="#">📊 Évaluations</a><a href="#">🔧 Maintenances</a><a href="#">📈 Rapports</a><a href="#">👥 Utilisateurs</a>
+    </div>
+    <div class="content">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+        <div>
+          <h1>Toyota Land Cruiser <span class="badge b-green" style="font-size:12px;vertical-align:middle">En service</span></h1>
+          <div class="subtitle">N° série VEH-2026-101 · Véhicule de service</div>
+        </div>
+        <div>
+          <button class="btn btn-outline">✎ Modifier</button>
+          <button class="btn btn-primary">🔁 Affecter</button>
+          <button class="btn btn-outline">📊 Évaluer</button>
+          <button class="btn btn-outline">🔧 Maintenance</button>
+        </div>
+      </div>
+
+      <div class="kv">
+        <div class="item"><div class="k">Valeur actuelle</div><div class="v">42 000 000 FCFA</div></div>
+        <div class="item"><div class="k">Valeur acquisition</div><div class="v">45 000 000 FCFA</div></div>
+        <div class="item"><div class="k">État</div><div class="v">Bon</div></div>
+        <div class="item"><div class="k">Date acquisition</div><div class="v">15/03/2023</div></div>
+      </div>
+
+      <div class="panel" style="margin-bottom:20px">
+        <div class="panel-head"><strong>Informations</strong></div>
+        <div style="padding:8px 18px">
+          <div class="info-row"><span class="k">Marque / Modèle</span><span class="v">Toyota / Land Cruiser</span></div>
+          <div class="info-row"><span class="k">Catégorie</span><span class="v">Véhicule de service</span></div>
+          <div class="info-row"><span class="k">Localisation</span><span class="v">Littoral / Cotonou — Ministère des Finances, bloc B</span></div>
+          <div class="info-row"><span class="k">Responsable</span><span class="v">Agent Patrimoine (ID 2)</span></div>
+          <div class="info-row"><span class="k">Affectation en cours</span><span class="v">Direction Générale — depuis 01/04/2023</span></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="tabs">
+          <div class="tab active">Historique</div>
+          <div class="tab">Affectations (2)</div>
+          <div class="tab">Évaluations (3)</div>
+          <div class="tab">Maintenances (1)</div>
+        </div>
+        <div style="padding:18px">
+          <div class="timeline">
+            <div class="ev"><strong>Acquisition enregistrée</strong> — 15/03/2023 · valeur 45 000 000 FCFA<div class="t">par Agent Patrimoine</div></div>
+            <div class="ev"><strong>Affectation : Direction Générale</strong> — 01/04/2023<div class="t">par Agent Patrimoine</div></div>
+            <div class="ev"><strong>Évaluation annuelle</strong> — valeur estimée 42 000 000 FCFA, état : bon<div class="t">12/06/2026 · par Responsable Patrimoine</div></div>
+            <div class="ev"><strong>Maintenance préventive</strong> — révision 100 000 km, 180 000 FCFA<div class="t">08/09/2026 · clôturée</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ECRAN 5 : MAINTENANCES ============ -->
+<div class="screen-label">Écran 5 — Maintenances</div>
+<div class="screen">
+  <div class="navbar"><span class="brand">GPE — Gestion du Patrimoine</span><span class="user">Agent Patrimoine · Déconnexion</span></div>
+  <div class="layout">
+    <div class="sidebar">
+      <a href="#">▦ Tableau de bord</a><a href="#">🗂 Actifs</a><a href="#">📍 Localisations</a><a href="#">🏷 Catégories</a><a href="#">🔁 Affectations</a><a href="#">📊 Évaluations</a><a href="#" class="active">🔧 Maintenances</a><a href="#">📈 Rapports</a><a href="#">👥 Utilisateurs</a>
+    </div>
+    <div class="content">
+      <h1>Maintenances</h1>
+      <div class="subtitle">Ordres de maintenance des actifs</div>
+
+      <div class="alert-info">⚠ 2 maintenances correctives urgentes en cours · Coût total des maintenances closes : 1 240 000 FCFA</div>
+
+      <div class="filters">
+        <input class="input w200" placeholder="🔍 Rechercher un actif…">
+        <select class="select w160"><option>Tous les statuts</option><option>Ouvert</option><option>En cours</option><option>Clos</option></select>
+        <select class="select w160"><option>Tous les types</option><option>Préventive</option><option>Corrective</option></select>
+        <button class="btn btn-primary">+ Nouvelle maintenance</button>
+      </div>
+
+      <div class="panel">
+        <table>
+          <tr><th>Actif</th><th>Type</th><th>Date demande</th><th>Description</th><th>Coût</th><th>Statut</th><th></th></tr>
+          <tr><td>Toyota Hilux (VEH-2020-007)</td><td><span class="badge b-blue">Corrective</span></td><td>09/11/2026</td><td>Fuite d'huile moteur</td><td>—</td><td><span class="badge b-orange">En cours</span></td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:12px">Ouvrir</button></td></tr>
+          <tr><td>PC Dell Latitude (INFO-2026-044)</td><td><span class="badge b-green">Préventive</span></td><td>20/10/2026</td><td>Maintenance trimestrielle</td><td>25 000</td><td><span class="badge b-gray">Clos</span></td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:12px">Détail</button></td></tr>
+          <tr><td>Bâtiment bloc B (IMM-2019-002)</td><td><span class="badge b-blue">Corrective</span></td><td>02/11/2026</td><td>Fissure mur pignon sud</td><td>450 000</td><td><span class="badge b-orange">En cours</span></td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:12px">Ouvrir</button></td></tr>
+          <tr><td>Climatiseur split (EQP-2021-003)</td><td><span class="badge b-green">Préventive</span></td><td>15/09/2026</td><td>Nettoyage filtres</td><td>35 000</td><td><span class="badge b-gray">Clos</span></td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:12px">Détail</button></td></tr>
+          <tr><td>Toyota Land Cruiser (VEH-2026-101)</td><td><span class="badge b-green">Préventive</span></td><td>08/09/2026</td><td>Révision 100 000 km</td><td>180 000</td><td><span class="badge b-gray">Clos</span></td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:12px">Détail</button></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer-note">Maquette GPE — 5 écrans · format 1440 px · à importer dans Figma via capture d'écran</div>
+</body>
+</html>
