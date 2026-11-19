@@ -8,6 +8,7 @@ use App\Http\Controllers\LocalisationController;
 use App\Http\Controllers\RapportController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/debug-log', fn () => response()->file(storage_path('logs/laravel.log')));
 Route::get('/health', fn () => response()->json(['service' => 'asset-service', 'status' => 'ok']));
 
 Route::middleware('auth.service')->group(function () {
