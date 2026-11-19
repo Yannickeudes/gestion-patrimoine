@@ -5,6 +5,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 // Authentification publique
+Route::get('/health', fn () => response()->json(['service' => 'auth-service', 'status' => 'ok']));
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 

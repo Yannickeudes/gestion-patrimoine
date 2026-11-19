@@ -39,4 +39,10 @@ if [ "${APP_ENV}" = "production" ]; then
     php artisan route:cache
 fi
 
+# Render/plateformes : ecouter sur $PORT (defaut 8000 en local)
+PORT="${PORT:-8000}"
+sed -i "s/^Listen 80/Listen ${PORT}/" /etc/apache2/ports.conf 2>/dev/null || true
+sed -i "s/<VirtualHost \*:80>/<VirtualHost *:${PORT}>/" /etc/apache2/sites-available/000-default.conf 2>/dev/null || true
+sed -i "s/ServerName .*/ServerName localhost/" /etc/apache2/apache2.conf 2>/dev/null || true
+
 exec "$@"

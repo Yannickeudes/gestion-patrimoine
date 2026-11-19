@@ -1,13 +1,22 @@
 # Blueprint Render — déploiement GPE
 # Doc : https://render.com/docs/blueprint-spec
 #
-# Prérequis : créer les 3 bases PostgreSQL (une par service) ou utiliser
-# une seule instance avec 3 databases. Adapter DB_DATABASE ci-dessous.
+# 3 services Laravel (Docker) + 3 bases PostgreSQL (une par service).
+# L'UI web est servie par asset-service (interface Blade) — pas de gateway
+# Nginx sur Render (les upstreams Docker internes ne résolvent pas).
 
 databases:
-  - name: gpe-db
+  - name: gpe-auth-db
     plan: free
     databaseName: gpe_auth
+    user: gpe
+  - name: gpe-assets-db
+    plan: free
+    databaseName: gpe_assets
+    user: gpe
+  - name: gpe-maintenance-db
+    plan: free
+    databaseName: gpe_maintenance
     user: gpe
 
 services:
@@ -16,28 +25,33 @@ services:
     runtime: docker
     dockerfilePath: ./services/auth-service/Dockerfile
     dockerContext: ./services/auth-service
+    healthCheckPath: /api/health
     envVars:
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
         value: "false"
+      - key: APP_KEY
+        generateValue: true
       - key: DB_HOST
         fromDatabase:
-          name: gpe-db
+          name: gpe-auth-db
           property: host
       - key: DB_PORT
         fromDatabase:
-          name: gpe-db
+          name: gpe-auth-db
           property: port
       - key: DB_DATABASE
-        value: gpe_auth
+        fromDatabase:
+          name: gpe-auth-db
+          property: database
       - key: DB_USERNAME
         fromDatabase:
-          name: gpe-db
+          name: gpe-auth-db
           property: user
       - key: DB_PASSWORD
         fromDatabase:
-          name: gpe-db
+          name: gpe-auth-db
           property: password
 
   - type: web
@@ -45,33 +59,35 @@ services:
     runtime: docker
     dockerfilePath: ./services/asset-service/Dockerfile
     dockerContext: ./services/asset-service
+    healthCheckPath: /api/health
     envVars:
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
         value: "false"
+      - key: APP_KEY
+        generateValue: true
       - key: AUTH_SERVICE_URL
-        fromService:
-          name: gpe-auth
-          type: web
-          property: host
+        value: https://gpe-auth.onrender.com
       - key: DB_HOST
         fromDatabase:
-          name: gpe-db
+          name: gpe-assets-db
           property: host
       - key: DB_PORT
         fromDatabase:
-          name: gpe-db
+          name: gpe-assets-db
           property: port
       - key: DB_DATABASE
-        value: gpe_assets
+        fromDatabase:
+          name: gpe-assets-db
+          property: database
       - key: DB_USERNAME
         fromDatabase:
-          name: gpe-db
+          name: gpe-assets-db
           property: user
       - key: DB_PASSWORD
         fromDatabase:
-          name: gpe-db
+          name: gpe-assets-db
           property: password
 
   - type: web
@@ -79,36 +95,35 @@ services:
     runtime: docker
     dockerfilePath: ./services/maintenance-service/Dockerfile
     dockerContext: ./services/maintenance-service
+    healthCheckPath: /api/health
     envVars:
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
         value: "false"
+      - key: APP_KEY
+        generateValue: true
       - key: AUTH_SERVICE_URL
-        fromService:
-          name: gpe-auth
-          type: web
-          property: host
+        value: https://gpe-auth.onrender.com
       - key: ASSET_SERVICE_URL
-        fromService:
-          name: gpe-assets
-          type: web
-          property: host
+        value: https://gpe-assets.onrender.com
       - key: DB_HOST
         fromDatabase:
-          name: gpe-db
+          name: gpe-maintenance-db
           property: host
       - key: DB_PORT
         fromDatabase:
-          name: gpe-db
+          name: gpe-maintenance-db
           property: port
       - key: DB_DATABASE
-        value: gpe_maintenance
+        fromDatabase:
+          name: gpe-maintenance-db
+          property: database
       - key: DB_USERNAME
         fromDatabase:
-          name: gpe-db
+          name: gpe-maintenance-db
           property: user
       - key: DB_PASSWORD
         fromDatabase:
-          name: gpe-db
+          name: gpe-maintenance-db
           property: password
