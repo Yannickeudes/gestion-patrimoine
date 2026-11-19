@@ -10,7 +10,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 
 # Skeleton Laravel officiel (config, artisan, public, vendor de base)
-RUN composer create-project "laravel/laravel:^11.0" . --no-interaction --prefer-dist \
+RUN composer create-project "laravel/laravel:^12.0" . --no-interaction --prefer-dist \
     && composer require laravel/sanctum --no-interaction
 
 # Notre code applicatif (copie par-dessus le skeleton)
@@ -22,7 +22,7 @@ COPY resources ./resources
 COPY routes ./routes
 COPY artisan ./
 COPY .env.example ./
-RUN composer install --no-interaction --prefer-dist \
+RUN composer update --no-interaction --prefer-dist \
     && composer dump-autoload --optimize
 
 # Apache : document root sur public/

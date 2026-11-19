@@ -1,7 +1,7 @@
 # Gestion du Patrimoine de l'État (GPE)
 
 Plateforme de gestion du patrimoine de l'État — **architecture micro-services**,
-**Laravel 11**, **PostgreSQL**, **Docker**.
+**Laravel 12**, **PostgreSQL**, **Docker**.
 
 Projet réalisé dans le cadre du brief Simplonline « P3 DEV WEB 1 ».
 

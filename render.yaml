@@ -1,0 +1,114 @@
+# Blueprint Render — déploiement GPE
+# Doc : https://render.com/docs/blueprint-spec
+#
+# Prérequis : créer les 3 bases PostgreSQL (une par service) ou utiliser
+# une seule instance avec 3 databases. Adapter DB_DATABASE ci-dessous.
+
+databases:
+  - name: gpe-db
+    plan: free
+    databaseName: gpe_auth
+    user: gpe
+
+services:
+  - type: web
+    name: gpe-auth
+    runtime: docker
+    dockerfilePath: ./services/auth-service/Dockerfile
+    dockerContext: ./services/auth-service
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: DB_HOST
+        fromDatabase:
+          name: gpe-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: gpe-db
+          property: port
+      - key: DB_DATABASE
+        value: gpe_auth
+      - key: DB_USERNAME
+        fromDatabase:
+          name: gpe-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: gpe-db
+          property: password
+
+  - type: web
+    name: gpe-assets
+    runtime: docker
+    dockerfilePath: ./services/asset-service/Dockerfile
+    dockerContext: ./services/asset-service
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: AUTH_SERVICE_URL
+        fromService:
+          name: gpe-auth
+          type: web
+          property: host
+      - key: DB_HOST
+        fromDatabase:
+          name: gpe-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: gpe-db
+          property: port
+      - key: DB_DATABASE
+        value: gpe_assets
+      - key: DB_USERNAME
+        fromDatabase:
+          name: gpe-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: gpe-db
+          property: password
+
+  - type: web
+    name: gpe-maintenance
+    runtime: docker
+    dockerfilePath: ./services/maintenance-service/Dockerfile
+    dockerContext: ./services/maintenance-service
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: AUTH_SERVICE_URL
+        fromService:
+          name: gpe-auth
+          type: web
+          property: host
+      - key: ASSET_SERVICE_URL
+        fromService:
+          name: gpe-assets
+          type: web
+          property: host
+      - key: DB_HOST
+        fromDatabase:
+          name: gpe-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: gpe-db
+          property: port
+      - key: DB_DATABASE
+        value: gpe_maintenance
+      - key: DB_USERNAME
+        fromDatabase:
+          name: gpe-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: gpe-db
+          property: password

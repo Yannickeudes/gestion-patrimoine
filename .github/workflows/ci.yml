@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [auth-service, asset-service, maintenance-service]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: pgsql, mbstring, xml, ctype, json, bcmath, fileinfo, openssl
+          coverage: none
+
+      - name: Validate composer.json
+        working-directory: services/${{ matrix.service }}
+        run: composer validate --no-check-publish
+
+      - name: PHP syntax lint
+        working-directory: services/${{ matrix.service }}
+        run: |
+          find app routes database bootstrap -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - name: Check shell scripts line endings
+        run: |
+          ! grep -rlU $'\r' services/ --include='*.sh' || (echo "CRLF found in shell script" && exit 1)

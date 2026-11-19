@@ -4,7 +4,7 @@
 
 | Couche | Technologie |
 |---|---|
-| Backend | Laravel 11 (PHP 8.3) — un service par domaine métier |
+| Backend | Laravel 12 (PHP 8.3) — un service par domaine métier |
 | Auth | Laravel Sanctum (tokens Bearer) |
 | Base de données | PostgreSQL 16 (une base par service) |
 | Conteneurisation | Docker + Docker Compose |

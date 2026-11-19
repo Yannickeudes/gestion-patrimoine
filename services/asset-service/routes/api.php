@@ -11,7 +11,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/health', fn () => response()->json(['service' => 'asset-service', 'status' => 'ok']));
 
 Route::middleware('auth.service')->group(function () {
-    Route::apiResource('categories', CategorieController::class);
+    // 'categories' -> parametre {category} en singulier anglais : on force {categorie}
+    Route::apiResource('categories', CategorieController::class)
+        ->parameters(['categories' => 'categorie']);
     Route::apiResource('localisations', LocalisationController::class);
     Route::apiResource('actifs', ActifController::class);
     Route::post('actifs/{actif}/statut', [ActifController::class, 'changeStatut']);
