@@ -68,6 +68,22 @@ Toutes les routes `/api/v1/*` requièrent `Authorization: Bearer <token>`
 
 Documentation complète : **[docs/guide-utilisation.md](docs/guide-utilisation.md)**
 
+## Déploiement (production)
+
+Plateforme hébergée gratuitement sur **Render** :
+
+| Service | URL |
+|---|---|
+| Auth | https://gpe-auth.onrender.com |
+| Assets + UI | https://gpe-assets.onrender.com |
+| Maintenance | https://gpe-maintenance.onrender.com |
+
+Comptes seedés : `admin@gpe.local / password`, `agent@gpe.local / password`.
+
+> ⚠️ Render free tier : les services se mettent en veille après inactivité
+> (première requête = ~30-60 s de démarrage) et la base PostgreSQL expire
+> après 30 jours — penser à la recréer/le sauvegarder pour une démo.
+
 ## Maquettes
 
 Maquettes UI dans **Figma** : [GPE — Maquettes Gestion du Patrimoine de l'État](https://www.figma.com/design/3VWvxTbVhZfRh733g9QeJe)
