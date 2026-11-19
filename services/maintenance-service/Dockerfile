@@ -30,6 +30,9 @@ ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -i 's#/var/www/html#/var/www/html/public#g' /etc/apache2/sites-available/000-default.conf \
     && a2enmod rewrite headers
 
+# Permissions ecriture pour Apache (www-data) : vues compilees, logs, cache
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
